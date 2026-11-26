@@ -104,13 +104,11 @@ SuperBlock* FileSystem::readSuperBlock( )
 	// read number of inodes from block
 	int numInodes =  byteArrayToInt(buffer, 4 );
 		  
-	// read start of free block to disk
-		  		  
-	// finish implementing this function 
+	// Read the first free block number
+	int firstFreeBlock = byteArrayToInt(buffer, 8); //Retrieve the remaining integer from the buffer
 
-	return NULL;
+	return new SuperBlock(numDiskBlocks, numInodes, firstFreeBlock); //Return a pointer to this superblock, remember to delete this when we are done using it.
 }
-
 /**
  * Writes the super block to disk.
  *
@@ -119,7 +117,7 @@ SuperBlock* FileSystem::readSuperBlock( )
 void FileSystem::writeSuperBlock(SuperBlock& superBlock )
 {
 	// setup buffer to be written to disk
-	char buffer[BLOCK_SIZE];
+	char buffer[BLOCK_SIZE] = {}; //Set to {} to avoid writing unitialized memory to our simulated disk. 
 			
 	// write number of disk blocks into buffer
 	intToByteArray( superBlock.getNumberOfDiskBlocks(), buffer, 0);
@@ -127,7 +125,11 @@ void FileSystem::writeSuperBlock(SuperBlock& superBlock )
 	// write number of inodes into buffer
 	intToByteArray( superBlock.getNumberOfInodes(), buffer, 4);
 	 
-    // finish this function
+    // write the first free block number into buffer
+	intToByteArray(superBlock.getFirstBlockFreeList(), buffer, 8);
+
+	// store the superblock in block 0
+	_disk->writeBlock(0, buffer, BLOCK_SIZE); 
 }
 	 
 /**
